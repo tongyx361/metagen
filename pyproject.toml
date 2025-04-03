@@ -4,10 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "metagen"
-version = "0.1.0"
+version = "0.0.1"
 dependencies = [
     "hydra-core", # NOTE: not "hydra"!
     "omegaconf",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "mypy"
 ]
 
 [tool.setuptools]

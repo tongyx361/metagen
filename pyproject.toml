@@ -8,6 +8,7 @@ version = "0.0.1"
 dependencies = [
     "hydra-core", # NOTE: not "hydra"!
     "omegaconf",
+    "datasets",
 ]
 
 [project.optional-dependencies]
@@ -15,6 +16,15 @@ dev = [
     "ruff==0.11.3",
     "mypy==1.15.0",
     "pre-commit",
+]
+
+notebook = [
+    "notebook",
+    "ipywidgets",
+]
+
+viz = [
+    "matplotlib",
 ]
 
 [tool.setuptools]

@@ -1,0 +1,7 @@
+path: "TIGER-Lab/TheoremQA"
+split: "test"
+field_map:
+  problem: "Question"
+  ref_ans: "Answer"
+drop_fields:
+  - "Picture"

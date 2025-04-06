@@ -1,0 +1,8 @@
+path: "json"
+data_files: # c.f. notebooks/downsample-mmlu-pro.ipynb
+  - "./data/datasets/mmlu-pro-1k.jsonl"
+# TODO: Randomize the option order at runtime
+field_map:
+  problem: "question"
+  ref_ans: "answer"
+  option_texts: "options"

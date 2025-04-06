@@ -1,0 +1,21 @@
+messages: # sample -> messages
+  # No system message
+  question:
+    role: user
+    content_template:
+      "{{ sample.problem | trim }}\n\nSolve the problem step by step and provide
+      the final answer in \"\\boxed{...}\"."
+tokenization: # apply_chat_template(tokenizer=False) -> text_seq (containing model-specific tokens)
+  add_generation_prompt: true
+text_seq_preprocessing: # text_seq -> processed_text_seq
+  remove_bos: true # Most inference engines usually add an BoS token at the beginnning
+  template: "{{ text_seq }}" # Keep as is but also allow for custom prefixes
+api_request: # client.text_completion(prompt=processed_text_seq, model=model) -> text_resp
+  gen_params:
+    max_tokens: 16384
+    temperature: 0.7
+    top_p: 0.95
+  max_retries: 5
+new_msg_preprocessing: # text_resp -> new_msg
+  role: assistant
+  content_template: "{{ text_resp.choices[0].message.content }}"

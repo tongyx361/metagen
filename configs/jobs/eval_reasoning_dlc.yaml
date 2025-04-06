@@ -1,0 +1,48 @@
+# Evaluation suite for reasoning used in "Demystifying Long CoT"
+defaults:
+  - /datasets/math_500@eval_reasoning_cot_boxed_qa.datasets.math_500
+  - /datasets/aime_2024@eval_reasoning_cot_boxed_qa.datasets.aime_2024
+  - /datasets/theorem_qa@eval_reasoning_cot_boxed_qa.datasets.theorem_qa
+  - /stages/qa@eval_reasoning_cot_boxed_qa.pipelines.cot_boxed_qa.stages.cot_boxed_qa
+  - /datasets/mmlu_pro_1k@eval_reasoning_mmlu_pro_official_qa.datasets.mmlu_pro_1k
+  - /stages/qa@eval_reasoning_mmlu_pro_official_qa.pipelines.mmlu_pro_official_qa.stages.mmlu_pro_official_qa
+
+eval_reasoning_cot_boxed_qa:
+  # /datasets@eval_reasoning_cot_boxed_qa.datasets:
+  pipelines:
+    cot_boxed_qa:
+      stages:
+        cot_boxed_qa:
+          messages: # sample -> messages
+            # No system message
+            question:
+              role: user
+              content_template:
+                "{{ sample.problem | trim }}\n\nSolve the problem step by step
+                and provide the final answer in \"\\boxed{...}\"."
+          # /stages/qa@eval_reasoning_cot_boxed_qa.pipelines.cot_boxed_qa.stages.cot_boxed_qa
+eval_reasoning_mmlu_pro_official_qa:
+  # /datasets@eval_reasoning_mmlu_pro_official_qa.datasets:
+  pipelines:
+    mmlu_pro_official_qa:
+      stages:
+        mmlu_pro_official_qa:
+          messages: # sample -> messages
+            # No system message
+            question:
+              role: user
+              # c.f. https://github.com/TIGER-AI-Lab/MMLU-Pro/blob/ef9890a4db3fd2c4fc50342606aac21093edb03f/evaluate_from_api.py#L216-L241
+              content_template: 'The following are multiple choice questions
+                (with answers) about {{ sample.category }}. Think step by step
+                and then output the answer in the format of "The answer is (X)"
+                at the end.
+
+
+                Question: {{ sample.problem }}
+
+                Options: {% for option_text in sample.option_texts %}{{ ["A",
+                "B", "C", "D", "E", "F", "G", "H", "I", "J"][loop.index0] }}. {{
+                option_text }}
+
+                {% endfor %}'
+          # /stages/qa@eval_reasoning_mmlu_pro_official_qa.pipelines.mmlu_pro_official_qa.stages.mmlu_pro_official_qa

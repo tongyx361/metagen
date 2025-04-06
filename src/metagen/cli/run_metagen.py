@@ -1,9 +1,12 @@
 from dataclasses import dataclass
+from logging import getLogger
 from typing import Optional
 
 import hydra
 from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING, OmegaConf
+
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -80,10 +83,42 @@ class MetaGenJobConfig:
 
 
 @dataclass
+class MetaGenTaskConfig:
+    client: ClientConfig = MISSING
+    debug: bool = False
+    dataset: DatasetConfig = MISSING
+    pipeline: PipelineConfig = MISSING
+
+
+@dataclass
 class MetaGenRunConfig:
     client: ClientConfig = MISSING
-    jobs: dict[str, MetaGenJobConfig] = MISSING
     debug: bool = False
+    jobs: dict[str, MetaGenJobConfig] = MISSING
+
+
+class MetaGenRunner:
+    def __init__(self, cfg: MetaGenRunConfig):
+        self.cfg = cfg
+        logger.info(OmegaConf.to_container(self.cfg))
+        logger.info(f"{len(self.task_cfg_lst)}")
+
+    @property
+    def task_cfg_lst(self) -> list[MetaGenTaskConfig]:
+        return [
+            MetaGenTaskConfig(
+                client=self.cfg.client,
+                debug=self.cfg.debug,
+                dataset=dataset_cfg,
+                pipeline=pipeline_cfg,
+            )
+            for job_cfg in self.cfg.jobs.values()
+            for dataset_cfg in job_cfg.datasets.values()
+            for pipeline_cfg in job_cfg.pipelines.values()
+        ]
+
+    def run(self) -> None:
+        pass
 
 
 cs = ConfigStore.instance()
@@ -92,9 +127,10 @@ cs.store(name=METAGEN_MAIN_CONFIG_NAME, node=MetaGenRunConfig)
 
 
 @hydra.main(version_base=None, config_name=METAGEN_MAIN_CONFIG_NAME)
-def my_app(cfg: MetaGenRunConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
+def run_metagen(cfg: MetaGenRunConfig) -> None:
+    runner = MetaGenRunner(cfg)
+    runner.run()
 
 
 if __name__ == "__main__":
-    my_app()
+    run_metagen()

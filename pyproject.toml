@@ -9,6 +9,12 @@ dependencies = [
     "hydra-core", # NOTE: not "hydra"!
     "omegaconf",
     "datasets",
+    "transformers",
+    "openai",
+    "jinja2",
+    "uvloop",
+    "orjson",
+    "tqdm",
 ]
 
 [project.optional-dependencies]
@@ -16,6 +22,7 @@ dev = [
     "ruff==0.11.3",
     "mypy==1.15.0",
     "pre-commit",
+    "types-tqdm",
 ]
 
 notebook = [

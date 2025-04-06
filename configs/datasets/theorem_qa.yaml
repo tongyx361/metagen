@@ -1,7 +1,7 @@
 path: "TIGER-Lab/TheoremQA"
 split: "test"
-field_map:
-  problem: "Question"
-  ref_ans: "Answer"
-drop_fields:
+column_mapping:
+  Question: "problem"
+  Answer: "ref_ans"
+rm_cols:
   - "Picture"

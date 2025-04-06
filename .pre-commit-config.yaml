@@ -15,6 +15,12 @@ repos:
         additional_dependencies:
           - hydra-core
           - omegaconf
+          - transformers
+          - openai
+          - orjson
+          - uvloop
+          - jinja2
+          - types-tqdm
 
   # https://github.com/srstevenson/nb-clean?tab=readme-ov-file#cleaning-pre-commit-hook
   - repo: https://github.com/srstevenson/nb-clean

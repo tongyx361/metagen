@@ -1,6 +1,6 @@
 path: "json"
 data_files:
   - "https://github.com/openai/prm800k/raw/refs/heads/main/prm800k/math_splits/test.jsonl"
-field_map:
-  ref_ans: "answer"
-  ref_sol: "solution"
+column_mapping:
+  answer: "ref_ans"
+  solution: "ref_sol"

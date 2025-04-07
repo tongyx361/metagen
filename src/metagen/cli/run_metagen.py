@@ -79,6 +79,7 @@ class GenerationConfig:
     max_tokens: int = MISSING
     temperature: float = 1.0
     top_p: float = 1.0
+    frequency_penalty: float = 0.0
     kwargs: dict = field(default_factory=dict)
 
 
@@ -228,6 +229,7 @@ class MetaGenRunner:
                 max_tokens=gen_params.max_tokens,
                 temperature=gen_params.temperature,
                 top_p=gen_params.top_p,
+                frequency_penalty=gen_params.frequency_penalty,
                 **gen_params.kwargs,
                 seed=seed,
             )

@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from glob import glob
 from logging import getLogger
 from typing import Any
 
@@ -24,6 +25,9 @@ cs.store(name=VERIFY_MAIN_CONFIG_NAME, node=VerifyConfig)
 @hydra.main(version_base=None, config_name=VERIFY_MAIN_CONFIG_NAME)
 def run_verify(cfg: VerifyConfig) -> None:
     logger.info(OmegaConf.to_container(cfg))
+    input_files = glob(cfg.input_file_pattern)
+    input_files.extend(cfg.input_files)
+    logger.info(f"{len(input_files)=}")
 
 
 if __name__ == "__main__":

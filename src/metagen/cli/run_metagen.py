@@ -309,6 +309,7 @@ class MetaGenRunner:
                             )
                         )
         await asyncio.gather(*task_group_lst)
+        logger.info("Done!")
 
 
 cs = ConfigStore.instance()

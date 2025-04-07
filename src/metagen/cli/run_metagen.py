@@ -22,9 +22,19 @@ logger = getLogger(__name__)
 
 @dataclass
 class ClientConfig:
+    """
+    Parameters
+    ----------
+    base_url: str default="http://localhost:8000/v1"
+        vLLM uses port 8000 by default.
+    timeout: Optional[float] default=None
+        `None` means no timeout.
+    """
+
     base_url: str = "http://localhost:8000/v1"  # vLLM
     api_key: str = "EMPTY"
-    max_retries: int = 5
+    max_retries: int = 100
+    timeout: Optional[float] = None
     kwargs: dict = field(default_factory=dict)
 
 
@@ -145,6 +155,7 @@ class MetaGenRunner:
             base_url=self.cfg.client.base_url,
             api_key=self.cfg.client.api_key,
             max_retries=self.cfg.client.max_retries,
+            timeout=self.cfg.client.timeout,
             **self.cfg.client.kwargs,
         )
 

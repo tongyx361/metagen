@@ -276,6 +276,7 @@ class MetaGenRunner:
             Path(self.cfg.save_dir)
             / f"{self.cfg.model.replace('/', '__')}__{dataset_id}__{pipeline_id}__{seed}"
         )
+        logger.info(f"Saving to {save_dir}...")
         save_dir.mkdir(parents=True, exist_ok=True)
         with open(save_dir / "metagen-records.jsonl", "wb") as f:
             for record in records:

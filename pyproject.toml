@@ -25,6 +25,10 @@ dev = [
     "types-tqdm",
 ]
 
+verify = [
+    "math-verify[antlr4_9_3]" # Compatible with hydra-core
+]
+
 notebook = [
     "notebook",
     "ipywidgets",

@@ -1,7 +1,7 @@
 # @package _global_
 defaults:
   # c.f. https://hydra.cc/docs/patterns/configuring_experiments/
-  - /jobs/eval_reasoning_dlc@jobs
+  - /common/jobs/eval_reasoning_dlc@jobs
 
 client:
   base_url: "http://localhost:8000/v1"
@@ -10,4 +10,8 @@ model: "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
 
 # /jobs/eval_reasoning_dlc@jobs
 
-save_dir: "./data/metagen-records"
+save:
+  records_home: "./data/metagen-runs"
+  records_file_name: "metagen-records.jsonl"
+  config_home: "./data/metagen-runs"
+  config_file_name: "metagen-config.yaml"

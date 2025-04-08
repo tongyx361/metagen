@@ -1,0 +1,6 @@
+# No system message
+question:
+  role: user
+  content_template:
+    "{{ sample.problem | trim }}\n\nSolve the problem step by step and provide
+    the final answer in \"\\boxed{...}\"."

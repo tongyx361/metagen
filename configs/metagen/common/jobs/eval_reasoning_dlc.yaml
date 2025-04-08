@@ -1,53 +1,46 @@
 # Evaluation suite for reasoning used in "Demystifying Long CoT"
 defaults:
-  - /stages/qa@eval_reasoning_cot_boxed_qa_sampling.pipelines.cot_boxed_qa.stages.cot_boxed_qa
-  - /datasets/aime_2024@eval_reasoning_cot_boxed_qa_sampling.datasets.aime_2024
-  - /stages/qa@eval_reasoning_cot_boxed_qa_greedy.pipelines.cot_boxed_qa.stages.cot_boxed_qa
-  - /datasets/math_500@eval_reasoning_cot_boxed_qa_greedy.datasets.math_500
-  - /datasets/theorem_qa@eval_reasoning_cot_boxed_qa_greedy.datasets.theorem_qa
-  - /datasets/mmlu_pro_1k@eval_reasoning_mmlu_pro_official_qa_greedy.datasets.mmlu_pro_1k
-  - /stages/qa@eval_reasoning_mmlu_pro_official_qa_greedy.pipelines.mmlu_pro_official_qa.stages.mmlu_pro_official_qa
+  - /common/stages/qa@eval_reasoning_cot_boxed_qa_mean16.pipelines.cot_boxed_qa_resp16k_t0p7_p0p95.stages.cot_boxed_qa
+  - /common/datasets/aime_2024@eval_reasoning_cot_boxed_qa_mean16.datasets.aime_2024
+  - /common/messages/cot_boxed_qa@eval_reasoning_cot_boxed_qa_mean16.pipelines.cot_boxed_qa_resp16k_t0p7_p0p95.stages.cot_boxed_qa.messages
+  - /common/stages/qa@eval_reasoning_cot_boxed_qa_mean4.pipelines.cot_boxed_qa_resp16k_t0p7_p0p95.stages.cot_boxed_qa
+  - /common/datasets/math_500@eval_reasoning_cot_boxed_qa_mean4.datasets.math_500
+  - /common/datasets/theorem_qa@eval_reasoning_cot_boxed_qa_mean4.datasets.theorem_qa
+  - /common/messages/cot_boxed_qa@eval_reasoning_cot_boxed_qa_mean4.pipelines.cot_boxed_qa_resp16k_t0p7_p0p95.stages.cot_boxed_qa.messages
+  - /common/datasets/mmlu_pro_1k@eval_reasoning_mmlu_pro_official_qa_mean4.datasets.mmlu_pro_1k
+  - /common/stages/qa@eval_reasoning_mmlu_pro_official_qa_mean4.pipelines.mmlu_pro_official_qa_resp16k_t0p7_p0p95.stages.mmlu_pro_official_qa
 
-eval_reasoning_cot_boxed_qa_sampling:
+eval_reasoning_cot_boxed_qa_mean16:
   seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+  # datasets: see defaults
   pipelines:
-    cot_boxed_qa:
+    cot_boxed_qa_resp16k_t0p7_p0p95:
       stages:
         cot_boxed_qa:
-          messages: # sample -> messages
-            # No system message
-            question:
-              role: user
-              content_template:
-                "{{ sample.problem | trim }}\n\nSolve the problem step by step
-                and provide the final answer in \"\\boxed{...}\"."
+          # messages: see defaults
           api_request: # client.text_completion(prompt=processed_text_seq, model=model) -> text_resp
             gen_params:
               max_tokens: 16384
               temperature: 0.7
               top_p: 0.95
-eval_reasoning_cot_boxed_qa_greedy:
-  seeds: [0]
+eval_reasoning_cot_boxed_qa_mean4:
+  seeds: [0, 1, 2, 3]
   pipelines:
-    cot_boxed_qa:
+    cot_boxed_qa_resp16k_t0p7_p0p95:
       stages:
         cot_boxed_qa:
-          messages: # sample -> messages
-            # No system message
-            question:
-              role: user
-              content_template:
-                "{{ sample.problem | trim }}\n\nSolve the problem step by step
-                and provide the final answer in \"\\boxed{...}\"."
+          # messages: see defaults
           api_request: # client.text_completion(prompt=processed_text_seq, model=model) -> text_resp
             gen_params:
               max_tokens: 16384
-              temperature: 0.0
-              top_p: 1.0
-eval_reasoning_mmlu_pro_official_qa_greedy:
-  seeds: [0]
+              temperature: 0.7
+              top_p: 0.95
+          # see defaults for others
+eval_reasoning_mmlu_pro_official_qa_mean4:
+  seeds: [0, 1, 2, 3]
+  # datasets: see defaults
   pipelines:
-    mmlu_pro_official_qa:
+    mmlu_pro_official_qa_resp16k_t0p7_p0p95:
       stages:
         mmlu_pro_official_qa:
           messages: # sample -> messages
@@ -71,5 +64,6 @@ eval_reasoning_mmlu_pro_official_qa_greedy:
           api_request: # client.text_completion(prompt=processed_text_seq, model=model) -> text_resp
             gen_params:
               max_tokens: 16384
-              temperature: 0.0
-              top_p: 1.0
+              temperature: 0.7
+              top_p: 0.95
+          # see defaults for others

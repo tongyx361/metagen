@@ -115,12 +115,25 @@ class AsyncSchedulerConfig:
 
 
 @dataclass
+class MetaGenSaveConfig:
+    """
+    Final path: `f"{*_home}/{model.replace('/', '__')}__{dataset_id}__{pipeline_id}__{seed}/{*_file_name}"`
+    """
+
+    records_home: Path = field(default_factory=lambda: Path("./data/metagen-runs"))
+    records_file_name: str = "metagen-records.jsonl"
+    config_home: Path = field(default_factory=lambda: Path("./data/metagen-runs"))
+    config_file_name: str = "metagen-config.yaml"
+
+
+@dataclass
 class MetaGenRunConfig:
     async_scheduler: AsyncSchedulerConfig = field(default_factory=AsyncSchedulerConfig)
     client: ClientConfig = MISSING
     model: str = MISSING
     jobs: dict[str, MetaGenJobConfig] = MISSING
-    save_dir: str = "./data/metagen-records"
+    save: MetaGenSaveConfig = field(default_factory=MetaGenSaveConfig)
+    overwrite: bool = False
 
 
 class AsyncScheduler:
@@ -187,6 +200,19 @@ class MetaGenRunner:
                     continue
                 dataset_cache[dataset_id] = self.load_dataset(dataset_cfg)
         return dataset_cache
+
+    def get_task_save_path(
+        self,
+        dataset_id: str,
+        pipeline_id: str,
+        seed: int,
+        file_name: str,
+    ) -> Path:
+        return (
+            self.cfg.save.records_home
+            / f"{self.cfg.model.replace('/', '__')}__{dataset_id}__{pipeline_id}__{seed}"
+            / file_name
+        )
 
     async def run_pipeline(
         self,
@@ -260,6 +286,8 @@ class MetaGenRunner:
         dataset_id: str,
         pipeline_id: str,
         seed: int,
+        records_path: Path,
+        config_path: Path,
     ) -> None:
         job_cfg = self.cfg.jobs[job_id]
         dataset = self.dataset_cache[dataset_id]
@@ -274,13 +302,9 @@ class MetaGenRunner:
             for sample in dataset
         ]
         records = await asyncio.gather(*task_group)
-        save_dir = (
-            Path(self.cfg.save_dir)
-            / f"{self.cfg.model.replace('/', '__')}__{dataset_id}__{pipeline_id}__{seed}"
-        )
-        logger.info(f"Saving to {save_dir}...")
-        save_dir.mkdir(parents=True, exist_ok=True)
-        with open(save_dir / "metagen-records.jsonl", "wb") as f:
+        logger.info(f"Saving to {records_path=}...")
+        records_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(records_path, "wb") as f:
             for record in records:
                 f.write(orjson.dumps(record) + b"\n")
         dump_cfg = deepcopy(self.cfg)
@@ -291,23 +315,55 @@ class MetaGenRunner:
                 seeds=[seed],
             )
         }
-        with open(save_dir / "metagen-config.yaml", "w") as f:
+        config_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(config_path, "w") as f:
             f.write(OmegaConf.to_yaml(dump_cfg))
 
     async def run(self) -> None:
         task_group_lst = []
+        skip_path_dicts: list[dict[str, Path]] = []
         for job_id, job_cfg in self.cfg.jobs.items():
             for dataset_id in job_cfg.datasets.keys():
                 for pipeline_id in job_cfg.pipelines.keys():
                     for seed in job_cfg.seeds:
+                        records_path = self.get_task_save_path(
+                            dataset_id=dataset_id,
+                            pipeline_id=pipeline_id,
+                            seed=seed,
+                            file_name=self.cfg.save.records_file_name,
+                        )
+                        config_path = self.get_task_save_path(
+                            dataset_id=dataset_id,
+                            pipeline_id=pipeline_id,
+                            seed=seed,
+                            file_name=self.cfg.save.config_file_name,
+                        )
+                        if (
+                            all(path.exists() for path in [records_path, config_path])
+                            and not self.cfg.overwrite
+                        ):
+                            skip_path_dicts.append(
+                                {
+                                    "records_path": records_path,
+                                    "config_path": config_path,
+                                }
+                            )
+                            continue
                         task_group_lst.append(
                             self.run_task_group(
                                 job_id=job_id,
                                 dataset_id=dataset_id,
                                 pipeline_id=pipeline_id,
                                 seed=seed,
+                                records_path=records_path,
+                                config_path=config_path,
                             )
                         )
+        if skip_path_dicts:
+            logger.info(
+                f"Skipping {len(skip_path_dicts)} tasks because their results exist at {skip_path_dicts=}"
+            )
+        logger.info(f"Running {len(task_group_lst)=} tasks...")
         await asyncio.gather(*task_group_lst)
         logger.info("Done!")
 

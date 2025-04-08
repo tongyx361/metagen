@@ -13,14 +13,14 @@ repos:
         files: src|tests
         args: []
         additional_dependencies:
+          - types-tqdm
+          - jinja2
+          - orjson
+          - uvloop
           - hydra-core
           - omegaconf
           - transformers
           - openai
-          - orjson
-          - uvloop
-          - jinja2
-          - types-tqdm
 
   # https://github.com/srstevenson/nb-clean?tab=readme-ov-file#cleaning-pre-commit-hook
   - repo: https://github.com/srstevenson/nb-clean

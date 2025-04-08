@@ -13,7 +13,7 @@ from datasets import Dataset, load_dataset  # type: ignore[import]
 from hydra.core.config_store import ConfigStore
 from jinja2 import Template
 from omegaconf import MISSING, OmegaConf
-from openai import AsyncOpenAI
+from openai import APIResponse, AsyncOpenAI
 from tqdm.asyncio import tqdm as tqdm_asyncio
 from transformers import AutoTokenizer, PreTrainedTokenizer
 
@@ -222,6 +222,7 @@ class MetaGenRunner:
         seed: int,
         pbar: Optional[tqdm_asyncio] = None,
     ) -> dict[str, Any]:
+        api_responses: list[APIResponse] = []
         for stage_cfg in pipeline_cfg.stages.values():
             if stage_cfg.messages is not None:
                 messages = [
@@ -260,7 +261,10 @@ class MetaGenRunner:
                 **gen_params.kwargs,
                 seed=seed,
             )
-            text_api_resp = await self.async_scheduler.run(task=text_api_req, pbar=pbar)
+            text_api_resp: APIResponse = await self.async_scheduler.run(
+                task=text_api_req, pbar=pbar
+            )
+            api_responses.append(text_api_resp)
             new_msg_content = Template(
                 stage_cfg.new_msg_preprocessing.content_template
             ).render(text_api_resp=text_api_resp)
@@ -277,6 +281,7 @@ class MetaGenRunner:
             },
             "output": {
                 "messages": messages,
+                "api_responses": [resp.json() for resp in api_responses],
             },
         }
         return dump_record

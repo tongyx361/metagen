@@ -87,6 +87,7 @@ class GenerationConfig:
     temperature: float = 1.0
     top_p: float = 1.0
     frequency_penalty: float = 0.0
+    extra_body: dict[str, Any] = field(default_factory=dict)
     kwargs: dict = field(default_factory=dict)
 
 
@@ -264,6 +265,7 @@ class MetaGenRunner:
                 temperature=gen_params.temperature,
                 top_p=gen_params.top_p,
                 frequency_penalty=gen_params.frequency_penalty,
+                extra_body=gen_params.extra_body,
                 **gen_params.kwargs,
                 seed=seed,
             )

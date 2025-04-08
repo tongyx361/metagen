@@ -8,6 +8,7 @@ VERL_ACTOR_CKPT_DIR=${VERL_ACTOR_CKPT_DIR-""}
 MODEL_NAME=${MODEL_NAME-""}
 [ -z "${MODEL_NAME}" ] && echo "Better set a MODEL_NAME" && exit 1
 TP_SIZE=${TP_SIZE:-1}
+OVERRIDES=${OVERRIDES:-""}
 VERL_REPO_DIR=${VERL_REPO_DIR-"../verl"}
 SAVE_HOME=${SAVE_HOME-"${HOME}/verl/data/metagen-runs"}
 LOG_HOME=${LOG_HOME-"${HOME}/verl/logs/metagen-runs"}
@@ -29,6 +30,7 @@ python -m metagen.cli.metagen \
     model=${MODEL_NAME} \
     save.records_home=${SAVE_HOME} \
     save.config_home=${SAVE_HOME} \
+    ${OVERRIDES} \
     2>&1 | tee ${LOG_HOME}/metagen-run-$(git rev-parse --short HEAD)-$(date +%Y%m%d-%H%M%S).log
 EOF
 

@@ -32,4 +32,5 @@ python -m metagen.cli.metagen \
     2>&1 | tee ${LOG_HOME}/metagen-run-$(git rev-parse --short HEAD)-$(date +%Y%m%d-%H%M%S).log
 EOF
 
+mkdir -p "${LOG_HOME}"
 eval "${metagen_cmd}"

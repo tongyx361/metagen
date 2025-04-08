@@ -35,6 +35,7 @@ MODEL_PATH="${MODEL_PATH}" MODEL_NAME="${MODEL_NAME}" \
 TP_SIZE="${TP_SIZE}" \
     bash scripts/launch_dp_server.sh
 
+log_path="${LOG_HOME}/metagen-run-$(git rev-parse --short HEAD)-$(date +%Y%m%d-%H%M%S).log"
 read -r -d '' metagen_cmd << EOF
 python -m metagen.cli.metagen \
     --config-dir=configs/metagen +run=eval_reasoning_dlc \
@@ -43,8 +44,7 @@ python -m metagen.cli.metagen \
     save.records_home=${SAVE_HOME} \
     save.config_home=${SAVE_HOME} \
     ${OVERRIDES} \
-    2>&1 | tee ${LOG_HOME}/metagen-run-$(git rev-parse --short HEAD)-$(date +%Y%m%d-%H%M%S).log
+    2>&1 | tee ${log_path}
 EOF
 
-mkdir -p "${LOG_HOME}"
-eval "${metagen_cmd}"
+mkdir -p "${LOG_HOME}" && echo "${metagen_cmd}" > "${log_path}" && eval "${metagen_cmd}"

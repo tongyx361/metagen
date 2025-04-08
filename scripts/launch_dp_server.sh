@@ -34,13 +34,14 @@ while [ $((i_server * TP_SIZE)) -lt "${num_gpus}" ]; do
     IFS=' ' read -r -a serve_gpu_ids <<< "${gpu_ids[@]:$((i_server * TP_SIZE)):${TP_SIZE}}" # e.g. 0 1
     serve_gpu_ids_str=$(IFS=,; echo "${serve_gpu_ids[*]}") # e.g. 0,1
 
+    server_log_path="${SERVER_LOG_DIR}/server-$(pip list | grep vllm | awk '{print $1"-"$2}')-$(date +%Y%m%d-%H%M%S)-port${port}.log"
     read -r -d '' serve_cmd << EOF
 CUDA_VISIBLE_DEVICES=${serve_gpu_ids_str} \
 vllm serve "${MODEL_PATH}" \
 --served-model-name "${MODEL_NAME}" \
 --tensor-parallel-size ${TP_SIZE} \
 --host localhost --port ${port} \
-> "${SERVER_LOG_DIR}/server-$(pip list | grep vllm | awk '{print $1"-"$2}')-$(date +%Y%m%d-%H%M%S)-port${port}.log" 2>&1  &
+> "${server_log_path}" 2>&1  &
 EOF
 
     if [ "${USE_UV}" -eq 1 ]; then
@@ -52,8 +53,7 @@ EOF
     if [ "${DEBUG}" -eq 1 ]; then
         echo "${serve_cmd}"
     else
-        mkdir -p "${SERVER_LOG_DIR}"
-        eval "${serve_cmd}"
+        mkdir -p "${SERVER_LOG_DIR}" && echo "${serve_cmd}" > "${server_log_path}" && eval "${serve_cmd}"
     fi
     i_server=$((i_server + 1))
 done
@@ -81,6 +81,5 @@ if [ "${DEBUG}" -eq 1 ]; then
     echo "${route_cmd}"
 else
     unset http_proxy # https_proxy no_proxy # If they are hard to resolve
-    mkdir -p "${ROUTER_LOG_DIR}"
-    eval "${route_cmd}"
+    mkdir -p "${ROUTER_LOG_DIR}" && echo "${route_cmd}" > "${router_log_path}" && eval "${route_cmd}"
 fi

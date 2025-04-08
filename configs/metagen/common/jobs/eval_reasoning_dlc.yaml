@@ -63,7 +63,7 @@ eval_reasoning_mmlu_pro_official_prompt_cot_boxed_qa_mean4:
                 {% endfor %}
 
                 Please solve the problem step by step and provide the final
-                answer in \boxed{...}.'
+                answer in "\boxed{...}".'
           api_request: # client.text_completion(prompt=processed_text_seq, model=model) -> text_resp
             gen_params:
               max_tokens: 16384

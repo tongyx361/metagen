@@ -28,6 +28,7 @@ read -r -d '' metagen_cmd << EOF
 python -m metagen.cli.metagen \
     --config-dir=configs/metagen +run=eval_reasoning_dlc \
     model=${MODEL_NAME} \
+    tokenizer=${MODEL_PATH} \
     save.records_home=${SAVE_HOME} \
     save.config_home=${SAVE_HOME} \
     ${OVERRIDES} \

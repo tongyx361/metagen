@@ -139,6 +139,7 @@ class MetaGenRunConfig:
     async_scheduler: AsyncSchedulerConfig = field(default_factory=AsyncSchedulerConfig)
     client: ClientConfig = MISSING
     model: str = MISSING
+    tokenizer: str = MISSING
     jobs: dict[str, MetaGenJobConfig] = MISSING
     save: MetaGenSaveConfig = field(default_factory=MetaGenSaveConfig)
     overwrite: bool = False
@@ -182,7 +183,7 @@ class MetaGenRunner:
         )
 
     def load_tokenizer(self) -> PreTrainedTokenizer:
-        tokenizer = AutoTokenizer.from_pretrained(self.cfg.model)
+        tokenizer = AutoTokenizer.from_pretrained(self.cfg.tokenizer)
         return tokenizer
 
     def load_dataset(self, dataset_cfg: DatasetConfig) -> Dataset:

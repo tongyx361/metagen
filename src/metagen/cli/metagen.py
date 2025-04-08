@@ -1,5 +1,5 @@
 import asyncio
-import os
+import time
 from copy import deepcopy
 from dataclasses import dataclass, field
 from logging import getLogger
@@ -21,6 +21,12 @@ logger = getLogger(__name__)
 
 
 @dataclass
+class CheckConfig:
+    interval: float = 30.0
+    timeout: float = 1800.0
+
+
+@dataclass
 class ClientConfig:
     """
     Parameters
@@ -32,11 +38,11 @@ class ClientConfig:
     """
 
     base_url: str = "http://localhost:8000/v1"  # vLLM
-    disable_http_proxy: bool = True
     api_key: str = "EMPTY"
     max_retries: int = 100
     timeout: Optional[float] = None
     kwargs: dict = field(default_factory=dict)
+    health_check: CheckConfig = field(default_factory=CheckConfig)
 
 
 @dataclass
@@ -325,6 +331,21 @@ class MetaGenRunner:
         with open(config_path, "w") as f:
             f.write(OmegaConf.to_yaml(dump_cfg))
 
+    async def check_health(self) -> None:
+        timeout = self.cfg.client.health_check.timeout
+        interval = self.cfg.client.health_check.interval
+
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                await self.client.models.list()
+                return
+            except Exception as e:
+                logger.warning(f"Health check failed: {e}")
+            await asyncio.sleep(interval)
+
+        raise RuntimeError(f"Health check timed out after {timeout=} seconds")
+
     async def run(self) -> None:
         task_group_lst = []
         skip_path_dicts: list[dict[str, Path]] = []
@@ -370,6 +391,7 @@ class MetaGenRunner:
                 f"Skipping {len(skip_path_dicts)} tasks because their results exist at {skip_path_dicts=}"
             )
         logger.info(f"Running {len(task_group_lst)=} tasks...")
+        await self.check_health()
         await asyncio.gather(*task_group_lst)
         logger.info("Done!")
 
@@ -382,8 +404,6 @@ cs.store(name=METAGEN_MAIN_CONFIG_NAME, node=MetaGenRunConfig)
 @hydra.main(version_base=None, config_name=METAGEN_MAIN_CONFIG_NAME)
 def run_metagen(cfg: MetaGenRunConfig) -> None:
     runner = MetaGenRunner(cfg)
-    if cfg.client.disable_http_proxy:
-        os.environ.pop("http_proxy", None)
     uvloop.run(runner.run())
 
 

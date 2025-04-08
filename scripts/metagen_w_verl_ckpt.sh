@@ -15,17 +15,18 @@ LOG_HOME=${LOG_HOME-"${HOME}/verl/logs/metagen-runs"}
 CACHE_ACTOR_CKPT_DIR=${CACHE_ACTOR_CKPT_DIR-""}
 
 if [ -z "${CACHE_ACTOR_CKPT_DIR}" ]; then
-    MODEL_PATH="${VERL_ACTOR_CKPT_DIR}/huggingface"
+    actor_ckpt_dir="${VERL_ACTOR_CKPT_DIR}"
 else
     mkdir -p "$(dirname "${CACHE_ACTOR_CKPT_DIR}")"
     cp -r "${VERL_ACTOR_CKPT_DIR}" "${CACHE_ACTOR_CKPT_DIR}"
-    MODEL_PATH="${CACHE_ACTOR_CKPT_DIR}/huggingface"
+    actor_ckpt_dir="${CACHE_ACTOR_CKPT_DIR}"
 fi
+MODEL_PATH="${actor_ckpt_dir}/huggingface"
 
 # If there exist no ${MODEL_PATH}/model.safetensors.index.json
 if [ ! -f "${MODEL_PATH}/model.safetensors.index.json" ]; then
     echo "Merging actor model from checkpoint shards..."
-    python "${VERL_REPO_DIR}/scripts/model_merger.py" --local_dir "${VERL_ACTOR_CKPT_DIR}"
+    python "${VERL_REPO_DIR}/scripts/model_merger.py" --local_dir "${actor_ckpt_dir}"
 fi
 
 if [ -z "${CACHE_ACTOR_CKPT_DIR}" ]; then

@@ -7,8 +7,8 @@ defaults:
   - /common/datasets/math_500@eval_reasoning_cot_boxed_qa_mean4.datasets.math_500
   - /common/datasets/theorem_qa@eval_reasoning_cot_boxed_qa_mean4.datasets.theorem_qa
   - /common/messages/cot_boxed_qa@eval_reasoning_cot_boxed_qa_mean4.pipelines.cot_boxed_qa_resp16k_t0p7_p0p95.stages.cot_boxed_qa.messages
-  - /common/datasets/mmlu_pro_1k@eval_reasoning_mmlu_pro_official_qa_mean4.datasets.mmlu_pro_1k
-  - /common/stages/qa@eval_reasoning_mmlu_pro_official_qa_mean4.pipelines.mmlu_pro_official_qa_resp16k_t0p7_p0p95.stages.mmlu_pro_official_qa
+  - /common/datasets/mmlu_pro_1k@eval_reasoning_mmlu_pro_official_prompt_cot_boxed_qa_mean4.datasets.mmlu_pro_1k
+  - /common/stages/qa@eval_reasoning_mmlu_pro_official_prompt_cot_boxed_qa_mean4.pipelines.mmlu_pro_official_prompt_cot_boxed_qa_resp16k_t0p7_p0p95.stages.mmlu_pro_official_prompt_cot_boxed_qa
 
 eval_reasoning_cot_boxed_qa_mean16:
   seeds: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
@@ -36,13 +36,13 @@ eval_reasoning_cot_boxed_qa_mean4:
               temperature: 0.7
               top_p: 0.95
           # see defaults for others
-eval_reasoning_mmlu_pro_official_qa_mean4:
+eval_reasoning_mmlu_pro_official_prompt_cot_boxed_qa_mean4:
   seeds: [0, 1, 2, 3]
   # datasets: see defaults
   pipelines:
-    mmlu_pro_official_qa_resp16k_t0p7_p0p95:
+    mmlu_pro_official_prompt_cot_boxed_qa_resp16k_t0p7_p0p95:
       stages:
-        mmlu_pro_official_qa:
+        mmlu_pro_official_prompt_cot_boxed_qa:
           messages: # sample -> messages
             # No system message
             question:
@@ -60,7 +60,10 @@ eval_reasoning_mmlu_pro_official_qa_mean4:
                 "B", "C", "D", "E", "F", "G", "H", "I", "J"][loop.index0] }}. {{
                 option_text }}
 
-                {% endfor %}'
+                {% endfor %}
+
+                Please solve the problem step by step and provide the final
+                answer in \boxed{...}.'
           api_request: # client.text_completion(prompt=processed_text_seq, model=model) -> text_resp
             gen_params:
               max_tokens: 16384

@@ -13,7 +13,12 @@ import yaml
 def load_template_from_yaml():
     # Path to the YAML file
     yaml_path = (
-        Path(__file__).parent.parent / "configs" / "jobs" / "eval_reasoning_dlc.yaml"
+        Path(__file__).parent.parent
+        / "configs"
+        / "metagen"
+        / "common"
+        / "jobs"
+        / "eval_reasoning_dlc.yaml"
     )
 
     # Read the YAML file
@@ -21,9 +26,13 @@ def load_template_from_yaml():
         yaml_content = yaml.safe_load(f)
 
     # Extract the template from the YAML structure
-    template_str = yaml_content["eval_reasoning_mmlu_pro_official_qa"]["pipelines"][
-        "mmlu_pro_official_qa"
-    ]["stages"]["mmlu_pro_official_qa"]["messages"]["question"]["content_template"]
+    template_str = yaml_content[
+        "eval_reasoning_mmlu_pro_official_prompt_cot_boxed_qa_mean4"
+    ]["pipelines"]["mmlu_pro_official_prompt_cot_boxed_qa_resp16k_t0p7_p0p95"][
+        "stages"
+    ]["mmlu_pro_official_prompt_cot_boxed_qa"]["messages"]["question"][
+        "content_template"
+    ]
     return template_str
 
 

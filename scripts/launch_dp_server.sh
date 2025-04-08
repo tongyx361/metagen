@@ -15,16 +15,16 @@ ROUTER_LOG_DIR=${ROUTER_LOG_DIR:-"./logs/router"}
 PRINT_TO_CONSOLE=${PRINT_TO_CONSOLE:-1}
 DEBUG=${DEBUG:-0}
 
-read -a gpu_ids <<< "${CUDA_VISIBLE_DEVICES//,/ }"
+IFS=',' read -r -a gpu_ids <<< "${CUDA_VISIBLE_DEVICES}"
 i_server=0
 num_gpus=${#gpu_ids[@]}
 worker_urls=()
-while [ $((i_server * TP_SIZE)) -lt ${num_gpus} ]; do
+while [ $((i_server * TP_SIZE)) -lt "${num_gpus}" ]; do
     port=$((BASE_PORT + i_server + 1))
     worker_url="http://localhost:${port}"
     worker_urls+=("${worker_url}")
     # [i_server * TP_SIZE, i_server * TP_SIZE + TP_SIZE) concatenated with commas
-    read -a serve_gpu_ids <<< "${gpu_ids[@]:$((i_server * TP_SIZE)):${TP_SIZE}}" # e.g. 0 1
+    IFS=' ' read -r -a serve_gpu_ids <<< "${gpu_ids[@]:$((i_server * TP_SIZE)):${TP_SIZE}}" # e.g. 0 1
     serve_gpu_ids_str=$(IFS=,; echo "${serve_gpu_ids[*]}") # e.g. 0,1
 
     # Define server parameters using heredoc

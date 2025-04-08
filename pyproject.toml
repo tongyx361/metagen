@@ -15,6 +15,7 @@ dependencies = [
     "uvloop",
     "orjson",
     "tqdm",
+    "pandas",
 ]
 
 [project.optional-dependencies]

@@ -13,16 +13,15 @@ VERL_REPO_DIR=${VERL_REPO_DIR-"../verl"}
 SAVE_HOME=${SAVE_HOME-"${HOME}/verl/data/metagen-runs"}
 LOG_HOME=${LOG_HOME-"${HOME}/verl/logs/metagen-runs"}
 
-# If there exist no ${VERL_ACTOR_CKPT_DIR}/huggingface/*.modeltensors
-if [ ! -f "${VERL_ACTOR_CKPT_DIR}/huggingface/model.safetensors.index.json" ]; then
+MODEL_PATH="${VERL_ACTOR_CKPT_DIR}/huggingface"
+
+# If there exist no ${MODEL_PATH}/model.safetensors.index.json
+if [ ! -f "${MODEL_PATH}/model.safetensors.index.json" ]; then
     echo "Merging actor model from checkpoint shards..."
     python "${VERL_REPO_DIR}/scripts/model_merger.py" --local_dir "${VERL_ACTOR_CKPT_DIR}"
 fi
 
-MODEL_PATH="${VERL_ACTOR_CKPT_DIR}/huggingface"
-
-MODEL_PATH="${MODEL_PATH}" \
-MODEL_NAME="${MODEL_NAME}" \
+MODEL_PATH="${MODEL_PATH}" MODEL_NAME="${MODEL_NAME}" \
 TP_SIZE="${TP_SIZE}" \
     bash scripts/launch_dp_server.sh
 

@@ -6,8 +6,8 @@ MODEL_NAME=${MODEL_NAME:-${MODEL_PATH}}
 num_tot_gpus=$(nvidia-smi --query-gpu=count --format=csv,noheader,nounits | head -n 1)
 CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-$(seq -s, 0 $((num_tot_gpus - 1)))}
 TP_SIZE=${TP_SIZE:-1}
-BASE_PORT=${BASE_PORT:-8000} # For DP router
-IP=${IP:-"0.0.0.0"}
+ROUTER_PORT=${ROUTER_PORT:-8000} # For DP router
+ROUTER_IP=${ROUTER_IP:-"0.0.0.0"}
 # Logging
 SERVER_LOG_DIR=${SERVER_LOG_DIR:-"./logs/server"}
 ROUTER_LOG_DIR=${ROUTER_LOG_DIR:-"./logs/router"}
@@ -27,7 +27,7 @@ i_server=0
 num_gpus=${#gpu_ids[@]}
 worker_urls=()
 while [ $((i_server * TP_SIZE)) -lt "${num_gpus}" ]; do
-    port=$((BASE_PORT + i_server + 1))
+    port=$((ROUTER_PORT + i_server + 1))
     worker_url="http://localhost:${port}"
     worker_urls+=("${worker_url}")
     # [i_server * TP_SIZE, i_server * TP_SIZE + TP_SIZE) concatenated with commas
@@ -61,7 +61,7 @@ done
 read -r -d '' route_cmd << EOF
 python -m sglang_router.launch_router \
 --worker-urls ${worker_urls[@]} \
---host "${IP}" --port "${BASE_PORT}"
+--host "${ROUTER_IP}" --port "${ROUTER_PORT}"
 EOF
 
 if [ "${USE_UV}" -eq 1 ]; then
@@ -70,7 +70,7 @@ else
     pip install sglang-router --user
 fi
 
-router_log_path="${ROUTER_LOG_DIR}/router-$(pip list | grep sglang-router | awk '{print $1"-"$2}')-$(date +%Y%m%d-%H%M%S)-port${BASE_PORT}.log"
+router_log_path="${ROUTER_LOG_DIR}/router-$(pip list | grep sglang-router | awk '{print $1"-"$2}')-$(date +%Y%m%d-%H%M%S)-port${ROUTER_PORT}.log"
 if [ "${PRINT_TO_CONSOLE}" -eq 1 ]; then
     route_cmd="${route_cmd} 2>&1 | tee ${router_log_path}"
 else

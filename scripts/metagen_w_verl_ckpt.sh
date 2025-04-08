@@ -19,9 +19,11 @@ if [ ! -f "${VERL_ACTOR_CKPT_DIR}/huggingface/model.safetensors.index.json" ]; t
     python "${VERL_REPO_DIR}/scripts/model_merger.py" --local_dir "${VERL_ACTOR_CKPT_DIR}"
 fi
 
-MODEL_PATH="${VERL_ACTOR_CKPT_DIR}/huggingface/model.safetensors" \
-MODEL_NAME=${MODEL_NAME} \
-TP_SIZE=${TP_SIZE} \
+MODEL_PATH="${VERL_ACTOR_CKPT_DIR}/huggingface"
+
+MODEL_PATH="${MODEL_PATH}" \
+MODEL_NAME="${MODEL_NAME}" \
+TP_SIZE="${TP_SIZE}" \
     bash scripts/launch_dp_server.sh
 
 read -r -d '' metagen_cmd << EOF

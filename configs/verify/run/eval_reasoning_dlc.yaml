@@ -3,7 +3,7 @@
 jobs:
   latex_or_expr_answer:
     input:
-      glob_pattern: "./data/metagen-records/*cot_boxed_qa*/metagen-records.jsonl"
+      glob_pattern: "./data/metagen-runs/*cot_boxed_qa*/metagen-records.jsonl"
       filter_for_regex_pattern: "^(?!.*mmlu).*$"
     pred_extraction_configs:
       - extraction_type: LATEX
@@ -13,8 +13,9 @@ jobs:
       - extraction_type: LATEX
   string_answer:
     input:
-      glob_pattern: "./data/metagen-records/*mmlu*/metagen-records.jsonl"
+      glob_pattern: "./data/metagen-runs/*mmlu*/metagen-records.jsonl"
     pred_extraction_configs:
+      - extraction_type: LATEX # For \boxed{...}
       - extraction_type: STRING
         kwargs:
           strings: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]

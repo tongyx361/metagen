@@ -7,8 +7,8 @@ VERL_ACTOR_CKPT_DIR=${VERL_ACTOR_CKPT_DIR-""}
 [ -z "${VERL_ACTOR_CKPT_DIR}" ] && echo "VERL_ACTOR_CKPT_DIR should be set as /path/to/global_step_*/actor/" && exit 1
 MODEL_NAME=${MODEL_NAME-""}
 [ -z "${MODEL_NAME}" ] && echo "Better set a MODEL_NAME" && exit 1
-VERL_REPO_DIR=${VERL_REPO_DIR-"../verl"}
 TP_SIZE=${TP_SIZE:-1}
+VERL_REPO_DIR=${VERL_REPO_DIR-"../verl"}
 SAVE_HOME=${SAVE_HOME-"${HOME}/verl/data/metagen-runs"}
 LOG_HOME=${LOG_HOME-"${HOME}/verl/logs/metagen-runs"}
 

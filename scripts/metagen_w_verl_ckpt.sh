@@ -13,7 +13,7 @@ SAVE_HOME=${SAVE_HOME-"${HOME}/verl/data/metagen-runs"}
 LOG_HOME=${LOG_HOME-"${HOME}/verl/logs/metagen-runs"}
 
 # If there exist no ${VERL_ACTOR_CKPT_DIR}/huggingface/*.modeltensors
-if [ ! -f "${VERL_ACTOR_CKPT_DIR}/huggingface/*.modeltensors" ]; then
+if [ ! -f "${VERL_ACTOR_CKPT_DIR}/huggingface/model.safetensors.index.json" ]; then
     echo "Merging actor model from checkpoint shards..."
     python "${VERL_REPO_DIR}/scripts/model_merger.py" --local_dir "${VERL_ACTOR_CKPT_DIR}"
 fi

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# pip install uv
 set -uxo pipefail
 
 MODEL_PATH=${MODEL_PATH:-"deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"}
@@ -14,6 +13,14 @@ SERVER_LOG_DIR=${SERVER_LOG_DIR:-"./logs/server"}
 ROUTER_LOG_DIR=${ROUTER_LOG_DIR:-"./logs/router"}
 PRINT_TO_CONSOLE=${PRINT_TO_CONSOLE:-0}
 DEBUG=${DEBUG:-0}
+VLLM_USE_V1=${VLLM_USE_V1:-1}
+USE_UV=${USE_UV:-0}
+
+export VLLM_USE_V1
+
+if [ "${USE_UV}" -eq 1 ]; then
+    pip install uv --user
+fi
 
 IFS=',' read -r -a gpu_ids <<< "${CUDA_VISIBLE_DEVICES}"
 i_server=0
@@ -27,15 +34,20 @@ while [ $((i_server * TP_SIZE)) -lt "${num_gpus}" ]; do
     IFS=' ' read -r -a serve_gpu_ids <<< "${gpu_ids[@]:$((i_server * TP_SIZE)):${TP_SIZE}}" # e.g. 0 1
     serve_gpu_ids_str=$(IFS=,; echo "${serve_gpu_ids[*]}") # e.g. 0,1
 
-    # Define server parameters using heredoc
     read -r -d '' serve_cmd << EOF
 CUDA_VISIBLE_DEVICES=${serve_gpu_ids_str} \
-uvx vllm serve "${MODEL_PATH}" \
+vllm serve "${MODEL_PATH}" \
 --served-model-name "${MODEL_NAME}" \
 --tensor-parallel-size ${TP_SIZE} \
 --host localhost --port ${port} \
-> "${SERVER_LOG_DIR}/$(date +%Y%m%d-%H%M%S)-port${port}.log" 2>&1  &
+> "${SERVER_LOG_DIR}/server-$(pip list | grep vllm | awk '{print $1"-"$2}')-$(date +%Y%m%d-%H%M%S)-port${port}.log" 2>&1  &
 EOF
+
+    if [ "${USE_UV}" -eq 1 ]; then
+        serve_cmd="uvx ${serve_cmd}"
+    else
+        pip install vllm --user
+    fi
 
     if [ "${DEBUG}" -eq 1 ]; then
         echo "${serve_cmd}"
@@ -46,24 +58,29 @@ EOF
     i_server=$((i_server + 1))
 done
 
-read -r -d '' router_cmd << EOF
-uv run --with sglang-router \
-    python -m sglang_router.launch_router \
-    --worker-urls ${worker_urls[@]} \
-    --host "${IP}" --port "${BASE_PORT}"
+read -r -d '' route_cmd << EOF
+python -m sglang_router.launch_router \
+--worker-urls ${worker_urls[@]} \
+--host "${IP}" --port "${BASE_PORT}"
 EOF
 
-router_log_path="${ROUTER_LOG_DIR}/$(date +%Y%m%d-%H%M%S)-port${BASE_PORT}.log"
-if [ "${PRINT_TO_CONSOLE}" -eq 1 ]; then
-    router_cmd="${router_cmd} 2>&1 | tee ${router_log_path}"
+if [ "${USE_UV}" -eq 1 ]; then
+    route_cmd="uv run --with sglang-router ${route_cmd}"
 else
-    router_cmd="${router_cmd} > ${router_log_path} 2>&1 &"
+    pip install sglang-router --user
+fi
+
+router_log_path="${ROUTER_LOG_DIR}/router-$(pip list | grep sglang-router | awk '{print $1"-"$2}')-$(date +%Y%m%d-%H%M%S)-port${BASE_PORT}.log"
+if [ "${PRINT_TO_CONSOLE}" -eq 1 ]; then
+    route_cmd="${route_cmd} 2>&1 | tee ${router_log_path}"
+else
+    route_cmd="${route_cmd} > ${router_log_path} 2>&1 &"
 fi
 
 if [ "${DEBUG}" -eq 1 ]; then
-    echo "${router_cmd}"
+    echo "${route_cmd}"
 else
     unset http_proxy
     mkdir -p "${ROUTER_LOG_DIR}"
-    eval "${router_cmd}"
+    eval "${route_cmd}"
 fi

@@ -252,7 +252,9 @@ class MetaGenRunner:
                     **stage_cfg.tokenization.kwargs,
                 ),
             )
-            if text_seq.startswith(self.tokenizer.bos_token):
+            if self.tokenizer.bos_token and text_seq.startswith(
+                self.tokenizer.bos_token
+            ):
                 text_seq = text_seq[len(self.tokenizer.bos_token) :]
                 # NOTE: Most inference engines add a BOS token at the beginning of the text sequence
             processed_text_seq = Template(

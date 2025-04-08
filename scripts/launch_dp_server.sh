@@ -12,7 +12,7 @@ IP=${IP:-"0.0.0.0"}
 # Logging
 SERVER_LOG_DIR=${SERVER_LOG_DIR:-"./logs/server"}
 ROUTER_LOG_DIR=${ROUTER_LOG_DIR:-"./logs/router"}
-PRINT_TO_CONSOLE=${PRINT_TO_CONSOLE:-1}
+PRINT_TO_CONSOLE=${PRINT_TO_CONSOLE:-0}
 DEBUG=${DEBUG:-0}
 
 IFS=',' read -r -a gpu_ids <<< "${CUDA_VISIBLE_DEVICES}"

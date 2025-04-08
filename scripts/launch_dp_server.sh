@@ -57,7 +57,7 @@ router_log_path="${ROUTER_LOG_DIR}/$(date +%Y%m%d-%H%M%S)-port${BASE_PORT}.log"
 if [ "${PRINT_TO_CONSOLE}" -eq 1 ]; then
     router_cmd="${router_cmd} 2>&1 | tee ${router_log_path}"
 else
-    router_cmd="${router_cmd} > ${router_log_path} 2>&1"
+    router_cmd="${router_cmd} > ${router_log_path} 2>&1 &"
 fi
 
 if [ "${DEBUG}" -eq 1 ]; then

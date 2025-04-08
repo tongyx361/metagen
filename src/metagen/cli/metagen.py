@@ -341,7 +341,9 @@ class MetaGenRunner:
                 await self.client.models.list()
                 return
             except Exception as e:
-                logger.warning(f"Health check failed: {e}")
+                logger.warning(
+                    f"Health check failed: {e}\nRetrying after {interval=} seconds..."
+                )
             await asyncio.sleep(interval)
 
         raise RuntimeError(f"Health check timed out after {timeout=} seconds")

@@ -80,7 +80,7 @@ fi
 if [ "${DEBUG}" -eq 1 ]; then
     echo "${route_cmd}"
 else
-    unset http_proxy
+    unset http_proxy # https_proxy no_proxy # If they are hard to resolve
     mkdir -p "${ROUTER_LOG_DIR}"
     eval "${route_cmd}"
 fi

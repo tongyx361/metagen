@@ -8,10 +8,12 @@ num_tot_gpus=$(nvidia-smi --query-gpu=count --format=csv,noheader,nounits | head
 CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-$(seq -s, 0 $((num_tot_gpus - 1)))}
 TP_SIZE=${TP_SIZE:-1}
 BASE_PORT=${BASE_PORT:-8000} # For DP router
-DEBUG=${DEBUG:-0}
 IP=${IP:-"0.0.0.0"}
+# Logging
 SERVER_LOG_DIR=${SERVER_LOG_DIR:-"./logs/server"}
 ROUTER_LOG_DIR=${ROUTER_LOG_DIR:-"./logs/router"}
+PRINT_TO_CONSOLE=${PRINT_TO_CONSOLE:-1}
+DEBUG=${DEBUG:-0}
 
 read -a gpu_ids <<< "${CUDA_VISIBLE_DEVICES//,/ }"
 i_server=0
@@ -48,9 +50,15 @@ read -r -d '' router_cmd << EOF
 uv run --with sglang-router \
     python -m sglang_router.launch_router \
     --worker-urls ${worker_urls[@]} \
-    --host "${IP}" --port "${BASE_PORT}" \
-    2>&1 | tee "${ROUTER_LOG_DIR}/$(date +%Y%m%d-%H%M%S)-port${BASE_PORT}.log"
+    --host "${IP}" --port "${BASE_PORT}"
 EOF
+
+router_log_path="${ROUTER_LOG_DIR}/$(date +%Y%m%d-%H%M%S)-port${BASE_PORT}.log"
+if [ "${PRINT_TO_CONSOLE}" -eq 1 ]; then
+    router_cmd="${router_cmd} 2>&1 | tee ${router_log_path}"
+else
+    router_cmd="${router_cmd} > ${router_log_path} 2>&1"
+fi
 
 if [ "${DEBUG}" -eq 1 ]; then
     echo "${router_cmd}"

@@ -17,6 +17,7 @@ CACHE_ACTOR_CKPT_DIR=${CACHE_ACTOR_CKPT_DIR-""}
 if [ -z "${CACHE_ACTOR_CKPT_DIR}" ]; then
     MODEL_PATH="${VERL_ACTOR_CKPT_DIR}/huggingface"
 else
+    mkdir -p "$(dirname "${CACHE_ACTOR_CKPT_DIR}")"
     cp -r "${VERL_ACTOR_CKPT_DIR}" "${CACHE_ACTOR_CKPT_DIR}"
     MODEL_PATH="${CACHE_ACTOR_CKPT_DIR}/huggingface"
 fi

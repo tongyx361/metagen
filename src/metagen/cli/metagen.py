@@ -32,6 +32,7 @@ class ClientConfig:
     """
 
     base_url: str = "http://localhost:8000/v1"  # vLLM
+    disable_http_proxy: bool = True
     api_key: str = "EMPTY"
     max_retries: int = 100
     timeout: Optional[float] = None
@@ -376,10 +377,10 @@ cs.store(name=METAGEN_MAIN_CONFIG_NAME, node=MetaGenRunConfig)
 @hydra.main(version_base=None, config_name=METAGEN_MAIN_CONFIG_NAME)
 def run_metagen(cfg: MetaGenRunConfig) -> None:
     runner = MetaGenRunner(cfg)
+    if cfg.client.disable_http_proxy:
+        os.environ.pop("http_proxy", None)
     uvloop.run(runner.run())
 
 
 if __name__ == "__main__":
-    if "http_proxy" in os.environ:
-        del os.environ["http_proxy"]
     run_metagen()

@@ -29,7 +29,7 @@ if [ ! -f "${MODEL_PATH}/model.safetensors.index.json" ]; then
     python "${VERL_REPO_DIR}/scripts/model_merger.py" --local_dir "${actor_ckpt_dir}"
 fi
 
-if [ -z "${CACHE_ACTOR_CKPT_DIR}" ]; then
+if [ -n "${CACHE_ACTOR_CKPT_DIR}" ]; then
     cp "${MODEL_PATH}/"* "${VERL_ACTOR_CKPT_DIR}/huggingface/"
 fi
 

@@ -1,7 +1,5 @@
-import re
 from dataclasses import dataclass, field
 from enum import Enum
-from glob import glob
 from logging import getLogger
 from pathlib import Path
 from typing import Any, Optional, Union
@@ -19,7 +17,7 @@ from math_verify.parser import (  # type: ignore[import]
 from omegaconf import OmegaConf
 from tqdm import tqdm
 
-from metagen.io import PathConfig  # type: ignore[import]
+from metagen.io import PathListConfig  # type: ignore[import]
 
 ParserExtractionConfig = Union[
     LatexExtractionConfig, ExprExtractionConfig, StringExtractionConfig
@@ -112,7 +110,7 @@ class ExtractionConfig:
 
 @dataclass
 class VerifyJobConfig:
-    input: PathConfig
+    input: PathListConfig
     pred_index: list[Any] = field(
         default_factory=lambda: ["output", "messages", -1, "content"]
     )
@@ -137,6 +135,7 @@ class VerifyJobConfig:
 @dataclass
 class VerifyRunConfig:
     jobs: dict[str, VerifyJobConfig]
+    use_verify_map: bool = False
 
 
 cs = ConfigStore.instance()
@@ -151,17 +150,8 @@ def run_verify(cfg: VerifyRunConfig) -> None:
     input_groups: list[VerifyInputGroup] = []
     for job_name, job_cfg in cfg.jobs.items():
         input_cfg = job_cfg.input
-        input_paths = input_cfg.paths
-        if input_cfg.glob_pattern:
-            matched_paths = glob(input_cfg.glob_pattern)
-            if input_cfg.filter_for_regex_pattern:
-                matched_paths = [
-                    path
-                    for path in matched_paths
-                    if re.match(input_cfg.filter_for_regex_pattern, path)
-                ]
-            input_paths.extend([Path(path) for path in matched_paths])
-
+        input_paths_cfg: PathListConfig = OmegaConf.to_object(input_cfg)
+        input_paths = input_paths_cfg.paths
         if len(input_paths) == 0:
             logger.warning(f"Found {len(input_paths)=} for {job_name}")
             continue
@@ -193,23 +183,32 @@ def run_verify(cfg: VerifyRunConfig) -> None:
             input_groups.append(VerifyInputGroup(path=input_path, units=input_units))
     logger.info(f"{len(input_groups)=}")
 
-    input_unit_map: dict[tuple[tuple[str, ...], tuple[str, ...]], VerifyInputUnit] = {}
-    for input_group in input_groups:
-        for unit in input_group.units:
-            input_unit_map[unit.verify_index] = unit
-    logger.info(f"{len(input_unit_map)=}")
-
     verify_map = {}
-    for verify_index, input_unit in tqdm(input_unit_map.items(), desc="Verifying"):
-        verify_map[verify_index] = verify(
-            gold=input_unit.golds, target=input_unit.answers
-        )
-    logger.info(f"{len(verify_map)=}")
+    if cfg.use_verify_map:
+        # Pre-compute verification results and cache them
+        input_unit_map: dict[
+            tuple[tuple[str, ...], tuple[str, ...]], VerifyInputUnit
+        ] = {}
+        for input_group in tqdm(input_groups, desc="Merging input units"):
+            for unit in input_group.units:
+                input_unit_map[unit.verify_index] = unit
+        logger.info(f"{len(input_unit_map)=}")
+        for verify_index, input_unit in tqdm(input_unit_map.items(), desc="Verifying"):
+            verify_map[verify_index] = verify(
+                gold=input_unit.golds, target=input_unit.answers
+            )
+        logger.info(f"{len(verify_map)=}")
 
-    for input_group in input_groups:
+    for input_group in tqdm(input_groups, desc="Verifying"):
         record_group = []
         for input_unit in input_group.units:
-            correct = verify_map[input_unit.verify_index]
+            if cfg.use_verify_map:
+                # Use cached verification result
+                correct = verify_map[input_unit.verify_index]
+            else:
+                # Compute verification on-the-fly
+                correct = verify(gold=input_unit.golds, target=input_unit.answers)
+
             record = {
                 "correct": correct,
                 "answers": [str(answer) for answer in (input_unit.answers or [])],

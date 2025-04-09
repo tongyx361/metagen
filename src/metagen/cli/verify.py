@@ -10,6 +10,7 @@ import hydra
 import orjson
 from hydra.core.config_store import ConfigStore
 from math_verify import parse, verify  # type: ignore[import]
+from math_verify.errors import TimeoutException  # type: ignore[import]
 from math_verify.parser import (  # type: ignore[import]
     ExprExtractionConfig,
     LatexExtractionConfig,
@@ -17,6 +18,8 @@ from math_verify.parser import (  # type: ignore[import]
 )
 from omegaconf import OmegaConf
 from tqdm import tqdm
+
+from metagen.io import PathConfig  # type: ignore[import]
 
 ParserExtractionConfig = Union[
     LatexExtractionConfig, ExprExtractionConfig, StringExtractionConfig
@@ -58,12 +61,17 @@ class VerifyInputUnit:
         gold_to_parse = self.raw_gold
         if self.add_boxed_to_gold and "\\boxed{" not in gold_to_parse:
             gold_to_parse = f"\\boxed{{{self.raw_gold}}}"
-        self.golds = parse(
-            gold_to_parse, extraction_config=self.gold_extraction_configs
-        )
-        self.answers = parse(
-            self.raw_pred, extraction_config=self.pred_extraction_configs
-        )
+        self.golds = self.try_parse(gold_to_parse, self.gold_extraction_configs)
+        self.answers = self.try_parse(self.raw_pred, self.pred_extraction_configs)
+
+    def try_parse(
+        self, text: str, extraction_config: ParserExtractionConfig
+    ) -> Optional[Any]:
+        try:
+            return parse(text, extraction_config=extraction_config)
+        except (Exception, TimeoutException) as e:
+            logger.warning(f"Failed to parse {text=}: {e}")
+            return None
 
     @property
     def verify_index(self) -> tuple[tuple[str, ...], tuple[str, ...]]:
@@ -100,13 +108,6 @@ class ExtractionType(Enum):
 class ExtractionConfig:
     extraction_type: ExtractionType
     kwargs: dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class PathConfig:
-    paths: list[Path] = field(default_factory=list)
-    glob_pattern: Optional[str] = None
-    filter_for_regex_pattern: Optional[str] = None
 
 
 @dataclass

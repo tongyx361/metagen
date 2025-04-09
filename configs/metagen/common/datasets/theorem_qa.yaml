@@ -1,7 +1,15 @@
-path: "TIGER-Lab/TheoremQA"
-split: "test"
-column_mapping:
-  Question: "problem"
-  Answer: "ref_ans"
-rm_cols:
-  - "Picture"
+load:
+  - path: "data/datasets/hf/TIGER-Lab--TheoremQA"
+    split: "test"
+    column_mapping:
+      Question: "problem"
+      Answer: "ref_ans"
+    rm_cols:
+      - "Picture"
+  - path: "TIGER-Lab/TheoremQA"
+    split: "test"
+    column_mapping:
+      Question: "problem"
+      Answer: "ref_ans"
+    rm_cols:
+      - "Picture"

@@ -1,6 +1,8 @@
-path: "json"
-data_files:
-  - "./data/datasets/aime-2024.jsonl"
-column_mapping:
-  origin_prompt: "problem"
-  gold_answer: "ref_ans"
+load:
+  - path: "json"
+    name: null
+    data_files:
+      - "./data/datasets/aime-2024.jsonl"
+    column_mapping:
+      origin_prompt: "problem"
+      gold_answer: "ref_ans"

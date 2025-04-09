@@ -14,6 +14,7 @@ repos:
         args: []
         additional_dependencies:
           - types-tqdm
+          - types-PyYAML
           - jinja2
           - orjson
           - uvloop

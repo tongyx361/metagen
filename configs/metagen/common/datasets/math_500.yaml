@@ -1,6 +1,13 @@
-path: "json"
-data_files:
-  - "https://github.com/openai/prm800k/raw/refs/heads/main/prm800k/math_splits/test.jsonl"
-column_mapping:
-  answer: "ref_ans"
-  solution: "ref_sol"
+load:
+  - path: "json"
+    data_files:
+      - "./data/datasets/math-500.jsonl"
+    column_mapping:
+      answer: "ref_ans"
+      solution: "ref_sol"
+  - path: "json"
+    data_files:
+      - "https://github.com/openai/prm800k/raw/refs/heads/main/prm800k/math_splits/test.jsonl"
+    column_mapping:
+      answer: "ref_ans"
+      solution: "ref_sol"

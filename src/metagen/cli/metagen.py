@@ -46,7 +46,7 @@ class ClientConfig:
 
 
 @dataclass
-class DatasetConfig:
+class LoadDatasetConfig:
     """
     input kwargs to HuggingFace `Datasets.load_dataset`.
         c.f. https://huggingface.co/docs/datasets/main/en/package_reference/loading_methods#datasets.load_dataset
@@ -59,6 +59,11 @@ class DatasetConfig:
     kwargs: dict = field(default_factory=dict)
     column_mapping: Optional[dict[str, str]] = None
     rm_cols: Optional[list[str]] = None
+
+
+@dataclass
+class DatasetConfig:
+    load: list[LoadDatasetConfig] = MISSING
 
 
 @dataclass
@@ -186,18 +191,18 @@ class MetaGenRunner:
         tokenizer = AutoTokenizer.from_pretrained(self.cfg.tokenizer)
         return tokenizer
 
-    def load_dataset(self, dataset_cfg: DatasetConfig) -> Dataset:
+    def load_dataset(self, cfg: LoadDatasetConfig) -> Dataset:
         dataset: Dataset = load_dataset(
-            path=dataset_cfg.path,
-            name=dataset_cfg.name,
-            split=dataset_cfg.split,
-            data_files=dataset_cfg.data_files,
-            **dataset_cfg.kwargs,
+            path=cfg.path,
+            name=cfg.name,
+            split=cfg.split,
+            data_files=cfg.data_files,
+            **cfg.kwargs,
         )
-        if dataset_cfg.rm_cols is not None:
-            dataset = dataset.remove_columns(column_names=dataset_cfg.rm_cols)
-        if dataset_cfg.column_mapping is not None:
-            dataset = dataset.rename_columns(column_mapping=dataset_cfg.column_mapping)
+        if cfg.rm_cols is not None:
+            dataset = dataset.remove_columns(column_names=cfg.rm_cols)
+        if cfg.column_mapping is not None:
+            dataset = dataset.rename_columns(column_mapping=cfg.column_mapping)
         return dataset
 
     def load_datasets(self) -> dict[str, Dataset]:
@@ -207,7 +212,17 @@ class MetaGenRunner:
                 logger.info(f"Loading {dataset_id=}...")
                 if dataset_id in dataset_cache:
                     continue
-                dataset_cache[dataset_id] = self.load_dataset(dataset_cfg)
+                for load_dataset_cfg in dataset_cfg.load:
+                    try:
+                        dataset = self.load_dataset(load_dataset_cfg)
+                        dataset_cache[dataset_id] = dataset
+                        break
+                    except Exception as e:
+                        logger.error(
+                            f"Failed to load dataset with {load_dataset_cfg=}\n"
+                            f"due to {e}"
+                        )
+                        continue
         return dataset_cache
 
     def get_task_save_path(

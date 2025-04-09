@@ -1,8 +1,9 @@
-path: "json"
-data_files: # c.f. notebooks/downsample-mmlu-pro.ipynb
-  - "./data/datasets/mmlu-pro-1k.jsonl"
-# TODO: Randomize the option order at runtime
-column_mapping:
-  question: "problem"
-  answer: "ref_ans"
-  options: "option_texts"
+load:
+  - path: "json"
+    data_files: # c.f. notebooks/downsample-mmlu-pro.ipynb
+      - "./data/datasets/mmlu-pro-1k.jsonl"
+    # TODO: Randomize the option order at runtime
+    column_mapping:
+      question: "problem"
+      answer: "ref_ans"
+      options: "option_texts"

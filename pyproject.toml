@@ -37,7 +37,7 @@ notebook = [
     "ipywidgets",
 ]
 
-viz = [
+analyze = [
     "matplotlib",
     "tabulate",
 ]

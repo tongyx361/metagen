@@ -33,7 +33,7 @@ def create_analyze_cfg_for_eval_reasoning_dlc_qwen2p5_32b_ppo_rewards() -> (
         for reward_name, reward_id in [
             ("Classic", "classic"),
             ("Cosine", "cosine"),
-            ("Cosine + Rep. Pen.", "cosine_rep_pen"),
+            ("Cosine + Rep. Pen.", "cosine-rep-pen"),
         ]:
             for step in [40, 80, 120, 160, 200]:
                 record = RecordConfig(

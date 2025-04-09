@@ -33,6 +33,8 @@ class ChartConfig:
     caption: str = MISSING
     pivot_kwargs: dict[str, Any] = field(default_factory=dict)
     records: list[RecordConfig] = field(default_factory=list)
+    factor: float = 1
+    fmt: str = "{}"
 
 
 @dataclass
@@ -84,7 +86,9 @@ def run_analyze(cfg: AnalyzeRunConfig) -> None:
             }
             for metric_cfg in record_cfg.metrics:
                 if metric_cfg.id == "acc/mean":
-                    record[metric_cfg.name] = sum(accs) / len(accs)
+                    mean_acc = sum(accs) / len(accs)
+                    mean_acc = chart_cfg.fmt.format(mean_acc * chart_cfg.factor)
+                    record[metric_cfg.name] = mean_acc
                 else:
                     raise ValueError(f"Unknown metric: {metric_cfg.id}")
             chart_records.append(record)

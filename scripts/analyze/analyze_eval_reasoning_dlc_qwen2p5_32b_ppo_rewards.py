@@ -31,7 +31,7 @@ def create_analyze_cfg_for_eval_reasoning_dlc_qwen2p5_32b_ppo_rewards() -> (
             ("MMLU-Pro-1k", "mmlu_pro_1k", "mmlu_pro_official_prompt_"),
         ]
     ):
-        caption = f"**Table {chart_idx + 1}:** {dataset_name} accuracy curves using different reward designs for PPO from the `Qwen2.5-32B` pretrained model."
+        caption = f"**Table {chart_idx + 1}:** {dataset_name} accuracy curves across steps using different reward designs for PPO from the `Qwen2.5-32B` pretrained model."
         records: list[RecordConfig] = []
         for reward_name, reward_id in [
             ("Classic", "classic"),
@@ -52,7 +52,13 @@ def create_analyze_cfg_for_eval_reasoning_dlc_qwen2p5_32b_ppo_rewards() -> (
                     metrics=[accuracy_metric],
                 )
                 records.append(record)
-        chart = ChartConfig(caption=caption, pivot_kwargs=pivot_kwargs, records=records)
+        chart = ChartConfig(
+            caption=caption,
+            factor=100,
+            fmt="{:.1f}",
+            pivot_kwargs=pivot_kwargs,
+            records=records,
+        )
         charts.append(chart)
     # Create and return the main configuration
     return AnalyzeRunConfig(charts=charts)

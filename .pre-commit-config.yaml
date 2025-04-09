@@ -19,6 +19,7 @@ repos:
           - jinja2
           - orjson
           - uvloop
+          - pebble
           - hydra-core
           - omegaconf
           - transformers

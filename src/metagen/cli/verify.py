@@ -1,3 +1,4 @@
+from concurrent.futures import TimeoutError
 from dataclasses import dataclass, field
 from enum import Enum
 from logging import getLogger
@@ -15,6 +16,7 @@ from math_verify.parser import (  # type: ignore[import]
     StringExtractionConfig,
 )
 from omegaconf import OmegaConf
+from pebble.concurrent import process
 from tqdm import tqdm
 
 from metagen.io import PathListConfig  # type: ignore[import]
@@ -136,6 +138,7 @@ class VerifyJobConfig:
 class VerifyRunConfig:
     jobs: dict[str, VerifyJobConfig]
     use_verify_map: bool = False
+    timeout: float = 5.0
 
 
 cs = ConfigStore.instance()
@@ -207,8 +210,21 @@ def run_verify(cfg: VerifyRunConfig) -> None:
                 correct = verify_map[input_unit.verify_index]
             else:
                 # Compute verification on-the-fly
-                correct = verify(gold=input_unit.golds, target=input_unit.answers)
-
+                try:
+                    # Create a decorated verify function with timeout
+                    verify_with_timeout = process(timeout=cfg.timeout)(verify)
+                    # Call the decorated function
+                    correct = verify_with_timeout(
+                        gold=input_unit.golds,
+                        target=input_unit.answers,
+                        timeout_seconds=int(cfg.timeout),
+                    ).result()  # type: ignore
+                except Exception as e:
+                    logger.warning(f"Error for {input_unit.raw_pred=}: {e}")
+                    correct = False
+                except (TimeoutError, TimeoutException) as e:
+                    logger.warning(f"Timeout for {input_unit.raw_pred=}: {e}")
+                    correct = False
             record = {
                 "correct": correct,
                 "answers": [str(answer) for answer in (input_unit.answers or [])],

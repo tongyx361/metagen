@@ -19,17 +19,15 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = [
-    "ruff==0.11.3",
-    "mypy==1.15.0",
-    "pre-commit",
-    "pandas-stubs",
-    "types-tqdm",
-    "types-PyYAML",
-]
 
 verify = [
-    "math-verify[antlr4_9_3]" # Compatible with hydra-core
+    "math-verify[antlr4_9_3]", # Compatible with hydra-core
+    "pebble", # TODO: Any more lightweight workaround for sympy timeout?
+]
+
+analyze = [
+    "matplotlib",
+    "tabulate",
 ]
 
 notebook = [
@@ -37,9 +35,13 @@ notebook = [
     "ipywidgets",
 ]
 
-analyze = [
-    "matplotlib",
-    "tabulate",
+dev = [
+    "ruff==0.11.3",
+    "mypy==1.15.0",
+    "pre-commit",
+    "pandas-stubs",
+    "types-tqdm",
+    "types-PyYAML",
 ]
 
 [tool.setuptools]

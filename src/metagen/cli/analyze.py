@@ -44,7 +44,6 @@ ANALYZE_MAIN_CONFIG_NAME = "analyze_run_config"
 cs.store(name=ANALYZE_MAIN_CONFIG_NAME, node=AnalyzeRunConfig)
 
 
-@hydra.main(version_base=None, config_name=ANALYZE_MAIN_CONFIG_NAME)
 def run_analyze(cfg: AnalyzeRunConfig) -> None:
     # Load data cache
     data_cache: dict[str, list[dict[str, Any]]] = {}
@@ -89,4 +88,4 @@ def run_analyze(cfg: AnalyzeRunConfig) -> None:
 
 
 if __name__ == "__main__":
-    run_analyze()
+    hydra.main(version_base=None, config_name=ANALYZE_MAIN_CONFIG_NAME)(run_analyze)()

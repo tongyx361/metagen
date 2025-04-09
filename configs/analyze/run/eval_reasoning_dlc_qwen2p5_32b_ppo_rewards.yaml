@@ -1,57 +1,63 @@
 # @package _global_
 
-- records:
-    - variables:
-        dataset: "AIME 2024"
-        reward_type: "Classic"
-        step: 40
-      data_srcs:
-        glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step40__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
-      metrics:
-        - id: "acc/mean"
-          name: "Accuracy"
-    - variables:
-        dataset: "AIME 2024"
-        reward_type: "Classic"
-        step: 80
-      data_srcs:
-        glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step80__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
-      metrics:
-        - id: "acc/mean"
-          name: "Accuracy"
-    - variables:
-        dataset: "AIME 2024"
-        reward_type: "Classic"
-        step: 80
-      data_srcs:
-        glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step80__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
-      metrics:
-        - id: "acc/mean"
-          name: "Accuracy"
-    - variables:
-        dataset: "AIME 2024"
-        reward_type: "Classic"
-        step: 120
-      data_srcs:
-        glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step120__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
-      metrics:
-        - id: "acc/mean"
-          name: "Accuracy"
-    - variables:
-        dataset: "AIME 2024"
-        reward_type: "Classic"
-        step: 160
-      data_srcs:
-        glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step120__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
-      metrics:
-        - id: "acc/mean"
-          name: "Accuracy"
-    - variables:
-        dataset: "AIME 2024"
-        reward_type: "Classic"
-        step: 200
-      data_srcs:
-        glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step120__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
-      metrics:
-        - id: "acc/mean"
-          name: "Accuracy"
+charts:
+  # AIME 2024
+  - records:
+      - pivot_kwargs:
+          index: "Reward"
+          columns: "Step"
+          values: "Accuracy"
+      - variables:
+          Dataset: "AIME 2024"
+          Reward: "Classic"
+          Step: 40
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step40__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
+        metrics:
+          - id: acc/mean
+            name: "Accuracy"
+      - variables:
+          Dataset: "AIME 2024"
+          Reward: "Classic"
+          Step: 80
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step80__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
+        metrics:
+          - id: acc/mean
+            name: "Accuracy"
+      - variables:
+          Dataset: "AIME 2024"
+          Reward: "Classic"
+          Step: 80
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step80__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
+        metrics:
+          - id: acc/mean
+            name: "Accuracy"
+      - variables:
+          Dataset: "AIME 2024"
+          Reward: "Classic"
+          Step: 120
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step120__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
+        metrics:
+          - id: acc/mean
+            name: "Accuracy"
+      - variables:
+          Dataset: "AIME 2024"
+          Reward: "Classic"
+          Step: 160
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step160__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
+        metrics:
+          - id: acc/mean
+            name: "Accuracy"
+      - variables:
+          Dataset: "AIME 2024"
+          Reward: "Classic"
+          Step: 200
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-classic-step200__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*"
+        metrics:
+          - id: acc/mean
+            name: "Accuracy"

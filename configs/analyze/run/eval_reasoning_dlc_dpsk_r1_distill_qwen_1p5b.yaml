@@ -1,7 +1,10 @@
 # @package _global_
 
 charts:
-  - pivot_kwargs:
+  - caption:
+      "**Table 1:** Accuracy of `DeepSeek-R1-Distill-Qwen-1.5B` on reasoning
+      tasks."
+    pivot_kwargs:
       index: "Model"
       columns: "Dataset"
       values: "Accuracy"

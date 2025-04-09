@@ -30,8 +30,9 @@ class RecordConfig:
 
 @dataclass
 class ChartConfig:
-    records: list[RecordConfig] = field(default_factory=list)
+    caption: str = MISSING
     pivot_kwargs: dict[str, Any] = field(default_factory=dict)
+    records: list[RecordConfig] = field(default_factory=list)
 
 
 @dataclass
@@ -90,7 +91,7 @@ def run_analyze(cfg: AnalyzeRunConfig) -> None:
 
         records_df = pd.DataFrame(chart_records)
         pivot_df = records_df.pivot(**chart_cfg.pivot_kwargs)
-        print(pivot_df.to_markdown())
+        print(f"""{chart_cfg.caption}\n\n{pivot_df.to_markdown()}\n\n""")
 
 
 if __name__ == "__main__":

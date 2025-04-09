@@ -191,6 +191,7 @@ def run_verify(cfg: VerifyRunConfig) -> None:
                 input_unit.parse()
                 input_units.append(input_unit)
             input_groups.append(VerifyInputGroup(path=input_path, units=input_units))
+    logger.info(f"{len(input_groups)=}")
 
     input_unit_map: dict[tuple[tuple[str, ...], tuple[str, ...]], VerifyInputUnit] = {}
     for input_group in input_groups:
@@ -203,6 +204,7 @@ def run_verify(cfg: VerifyRunConfig) -> None:
         verify_map[verify_index] = verify(
             gold=input_unit.golds, target=input_unit.answers
         )
+    logger.info(f"{len(verify_map)=}")
 
     for input_group in input_groups:
         record_group = []

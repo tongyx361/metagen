@@ -19,7 +19,7 @@ from omegaconf import OmegaConf
 from pebble.concurrent import process
 from tqdm import tqdm
 
-from metagen.io import PathListConfig  # type: ignore[import]
+from metagen.data import PathListConfig  # type: ignore[import]
 
 ParserExtractionConfig = Union[
     LatexExtractionConfig, ExprExtractionConfig, StringExtractionConfig
@@ -156,7 +156,6 @@ def run_verify(cfg: VerifyRunConfig) -> None:
         input_paths_cfg: PathListConfig = OmegaConf.to_object(input_cfg)
         input_paths = input_paths_cfg.paths
         if len(input_paths) == 0:
-            logger.warning(f"Found {len(input_paths)=} for {job_name}")
             continue
 
         logger.info(f"Loading {len(input_paths)=} for {job_name}")

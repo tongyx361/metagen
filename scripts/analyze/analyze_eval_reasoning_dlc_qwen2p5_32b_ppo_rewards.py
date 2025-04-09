@@ -5,7 +5,7 @@ from metagen.cli.analyze import (
     RecordConfig,
     run_analyze,
 )
-from metagen.io import PathListConfig
+from metagen.data import PathListConfig
 
 
 def create_analyze_cfg_for_eval_reasoning_dlc_qwen2p5_32b_ppo_rewards() -> (
@@ -43,6 +43,7 @@ def create_analyze_cfg_for_eval_reasoning_dlc_qwen2p5_32b_ppo_rewards() -> (
                         "Step": step,
                     },
                     data_srcs=PathListConfig(
+                        # data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-cosine-step160__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*
                         glob_pattern=f"./data/metagen-runs/demystify-long-cot__qwen2.5-32b-ppo-{reward_id}-step{step}__{dataset_id}__{pipeline_pfx}cot_boxed_qa_resp16k_t0p7_p0p95__*"
                     ),
                     metrics=[accuracy_metric],

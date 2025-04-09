@@ -9,7 +9,7 @@ from hydra.core.config_store import ConfigStore
 from omegaconf import MISSING, OmegaConf
 
 # TODO: fix this
-from metagen.io import PathListConfig  # type: ignore
+from metagen.data import PathListConfig  # type: ignore
 
 logger = getLogger(__name__)
 

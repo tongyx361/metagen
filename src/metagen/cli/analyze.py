@@ -49,7 +49,11 @@ def run_analyze(cfg: AnalyzeRunConfig) -> None:
     data_cache: dict[str, list[dict[str, Any]]] = {}
     for chart_cfg in cfg.charts:
         for record_cfg in chart_cfg.records:
-            data_srcs_cfg: PathListConfig = OmegaConf.to_object(record_cfg.data_srcs)
+            data_srcs_cfg: PathListConfig = (
+                record_cfg.data_srcs
+                if isinstance(record_cfg.data_srcs, PathListConfig)
+                else OmegaConf.to_object(record_cfg.data_srcs)
+            )
             for data_src_path in data_srcs_cfg.paths:
                 verify_records_path = data_src_path / "verify-records.jsonl"
                 if verify_records_path.as_posix() in data_cache:
@@ -62,8 +66,10 @@ def run_analyze(cfg: AnalyzeRunConfig) -> None:
         chart_records: list[dict[str, Any]] = []
         for record_cfg in chart_cfg.records:
             accs = []
-            record_data_srcs_cfg: PathListConfig = OmegaConf.to_object(
+            record_data_srcs_cfg: PathListConfig = (
                 record_cfg.data_srcs
+                if isinstance(record_cfg.data_srcs, PathListConfig)
+                else OmegaConf.to_object(record_cfg.data_srcs)
             )
             for data_src_path in record_data_srcs_cfg.paths:
                 verify_records_path = data_src_path / "verify-records.jsonl"

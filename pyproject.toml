@@ -23,6 +23,7 @@ dev = [
     "ruff==0.11.3",
     "mypy==1.15.0",
     "pre-commit",
+    "pandas-stubs",
     "types-tqdm",
     "types-PyYAML",
 ]
@@ -38,6 +39,7 @@ notebook = [
 
 viz = [
     "matplotlib",
+    "tabulate",
 ]
 
 [tool.setuptools]

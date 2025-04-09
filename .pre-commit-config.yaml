@@ -13,6 +13,7 @@ repos:
         files: src|tests
         args: []
         additional_dependencies:
+          - pandas-stubs
           - types-tqdm
           - types-PyYAML
           - jinja2

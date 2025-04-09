@@ -1,0 +1,43 @@
+# @package _global_
+
+charts:
+  - records:
+      - variables:
+          Model: "DeepSeek-R1-Distill-Qwen-1.5B"
+          Dataset: "AIME 2024"
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/deepseek-ai__DeepSeek-R1-Distill-Qwen-1.5B__aime_2024__cot_boxed_qa_resp16k_t0p7_p0p95__*/"
+        metrics:
+          - id: "acc/mean"
+            name: "Accuracy"
+      - variables:
+          Model: "DeepSeek-R1-Distill-Qwen-1.5B"
+          Dataset: "MATH-500"
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/deepseek-ai__DeepSeek-R1-Distill-Qwen-1.5B__math_500__cot_boxed_qa_resp16k_t0p7_p0p95__*/"
+        metrics:
+          - id: "acc/mean"
+            name: "Accuracy"
+      - variables:
+          Model: "DeepSeek-R1-Distill-Qwen-1.5B"
+          Dataset: "TheoremQA"
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/deepseek-ai__DeepSeek-R1-Distill-Qwen-1.5B__theorem_qa__cot_boxed_qa_resp16k_t0p7_p0p95__*/"
+        metrics:
+          - id: "acc/mean"
+            name: "Accuracy"
+      - variables:
+          Model: "DeepSeek-R1-Distill-Qwen-1.5B"
+          Dataset: "MMLU-Pro-1k"
+        data_srcs:
+          glob_pattern: "./data/metagen-runs/deepseek-ai__DeepSeek-R1-Distill-Qwen-1.5B__mmlu_pro_1k__mmlu_pro_official_qa_resp16k_t0p7_p0p95__*/"
+        metrics:
+          - id: "acc/mean"
+            name: "Accuracy"
+    pivot_kwargs:
+      index:
+        - Model
+      columns:
+        - Dataset
+      values:
+        - "Accuracy"

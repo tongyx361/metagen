@@ -1,0 +1,8 @@
+load:
+  - path: "json"
+    name: null
+    data_files:
+      - "./data/datasets/aime-2025-2.jsonl"
+    column_mapping:
+      origin_prompt: "question"
+      gold_answer: "answer"

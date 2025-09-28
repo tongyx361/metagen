@@ -1,0 +1,11 @@
+load:
+  - path: "data/datasets/hf/ByteDance-Seed--BeyondAIME"
+    split: "test"
+    column_mapping:
+      Question: "problem"
+      Answer: "answer"
+  - path: "ByteDance-Seed/BeyondAIME"
+    split: "test"
+    column_mapping:
+      Question: "problem"
+      Answer: "answer"
